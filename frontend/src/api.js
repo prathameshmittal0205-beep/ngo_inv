@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API = axios.create({ baseURL: 'https://ngo-engine-backend.onrender.com/api' });
+const API = axios.create({ baseURL: 'https://ngo-inv.onrender.com/api' });
 
 // --- INTERCEPTOR: ATTACH TOKEN AUTOMATICALLY ---
 API.interceptors.request.use((config) => {
