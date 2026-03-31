@@ -2,14 +2,14 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
 // --- IMPORT YOUR PAGES ---
-import Dashboard from './pages/Dashboard';
-import Donations from './pages/Donations';
-import Resources from './pages/Resources';
-import Requests from './pages/Requests';
-import Analytics from './pages/Analytics';
-import Donors from './pages/Donors';
-import Login from './pages/Login'; // The file you just created
-import Sidebar from './components/Sidebar';
+import Dashboard from './pages/Dashboard.jsx';
+import Donations from './pages/Donations.jsx';
+import Resources from './pages/Resources.jsx';
+import Requests from './pages/Requests.jsx';
+import Analytics from './pages/Analytics.jsx';
+import Donors from './pages/Donors.jsx';
+import Login from './pages/Login.jsx';
+import Sidebar from './components/Sidebar.jsx';
 
 // --- 🛡️ PROTECTED ROUTE COMPONENT ---
 // This acts as the gatekeeper. No token = No access.
