@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-// --- USE ENVIRONMENT VARIABLE FOR PRODUCTION, FALLBACK TO LOCALHOST ---
-const API = axios.create({ baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api' });
+// --- USE ENVIRONMENT VARIABLE FOR PRODUCTION, FALLBACK TO RAILWAY BACKEND ---
+const API = axios.create({ baseURL: import.meta.env.VITE_API_URL || 'https://ngoinv-production.up.railway.app/api' });
 
 // --- INTERCEPTOR: ATTACH TOKEN AUTOMATICALLY ---
 API.interceptors.request.use((config) => {
