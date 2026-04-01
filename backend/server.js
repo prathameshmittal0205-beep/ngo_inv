@@ -8,19 +8,12 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-// Use Environment Variable for Secret or a fallback for local dev
-const JWT_SECRET = process.env.JWT_SECRET || "ngo_connect_ultra_secret_2026"; 
+const JWT_SECRET = "ngo_connect_ultra_secret_2026"; 
 
-// --- 1. CLOUD DB CONNECTION ---
-// Updated to use your Atlas string via Environment Variables
-const atlasURI = process.env.MONGODB_URI || "mongodb+srv://praty:ngo123password@ngo-engine.mcj92vg.mongodb.net/ngo_db?retryWrites=true&w=majority&appName=NGO-Engine";
-
-mongoose.connect(atlasURI)
-    .then(() => console.log("🚀 CLOUD ENGINE: Connected to MongoDB Atlas"))
-    .catch(err => {
-        console.error("❌ Atlas Connection Error:", err.message);
-        process.exit(1); 
-    });
+// --- 1. DB CONNECTION ---
+mongoose.connect('mongodb://localhost:27017/ngo_db')
+    .then(() => console.log("🚀 NGO ENGINE: Connected to ngo_db"))
+    .catch(err => console.error("❌ DB Error:", err));
 
 // --- 2. MODELS ---
 const Donor = mongoose.model('Donor', new mongoose.Schema({
@@ -101,24 +94,17 @@ app.get('/api/donations', authenticate, async (req, res) => {
 app.post('/api/donations', authenticate, async (req, res) => {
     try {
         const { donor, item, quantity, unit, amount } = req.body;
-        console.log("📥 Incoming Donation Request:", req.body);
-        
         const donation = await new Donation({ donor, item, quantity, unit, amount }).save();
         
         let resObj = await Resource.findOne({ name: { $regex: new RegExp("^" + item.trim() + "$", "i") } });
-        
         if (resObj) {
             resObj.quantity += Number(quantity);
         } else {
             resObj = new Resource({ name: item, quantity, unit, donor, category: 'General' });
         }
-        
         await resObj.save();
         res.status(201).json(donation);
-    } catch (err) { 
-        console.error("❌ Donation Save Error:", err.message);
-        res.status(400).json({ error: err.message }); 
-    }
+    } catch (err) { res.status(400).json({ error: err.message }); }
 });
 
 // RESOURCES
@@ -131,16 +117,38 @@ app.post('/api/resources', authenticate, async (req, res) => {
     } catch (err) { res.status(400).json({ error: err.message }); }
 });
 
-app.delete('/api/resources/:id', authenticate, async (req, res) => {
+// --- DELETE DONATION & ADJUST STOCK ---
+// --- DELETE DONATION ROUTE ---
+app.delete('/api/donations/:id', authenticate, async (req, res) => {
     try {
-        const deletedResource = await Resource.findByIdAndDelete(req.params.id);
-        if (!deletedResource) return res.status(404).json({ message: "Resource not found" });
-        res.json({ message: "Resource successfully purged" });
+        const donationId = req.params.id;
+
+        // 1. Find the donation first so we know what item/quantity to deduct from stock
+        const donation = await Donation.findById(donationId);
+        if (!donation) {
+            return res.status(404).json({ message: "Donation record not found" });
+        }
+
+        // 2. Find the corresponding resource in inventory
+        const resource = await Resource.findOne({ 
+            name: { $regex: new RegExp("^" + donation.item.trim() + "$", "i") } 
+        });
+
+        // 3. Subtract the quantity from the resource stock
+        if (resource) {
+            resource.quantity = Math.max(0, resource.quantity - donation.quantity);
+            await resource.save();
+        }
+
+        // 4. Delete the donation record itself
+        await Donation.findByIdAndDelete(donationId);
+
+        res.json({ message: "Donation deleted and inventory updated." });
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        console.error("❌ Delete Error:", err.message);
+        res.status(500).json({ error: "Internal Server Error" });
     }
 });
-
 // REQUESTS
 app.get('/api/requests', authenticate, async (req, res) => {
     res.json(await Request.find().sort({ createdAt: -1 }));
@@ -187,19 +195,23 @@ app.patch('/api/requests/:id/fulfill', authenticate, async (req, res) => {
     }
 });
 
-// STATS & TOP DONORS
+// --- ANALYTICS ROUTES ---
+
 app.get('/api/stats', authenticate, async (req, res) => {
-    const donors = await Donor.countDocuments();
-    const resources = await Resource.find();
-    const totalStock = resources.reduce((sum, r) => sum + (Number(r.quantity) || 0), 0);
-    const moneyResult = await Donation.aggregate([{ $group: { _id: null, total: { $sum: "$amount" } } }]);
-    const fulfilled = await Request.countDocuments({ status: 'Fulfilled' });
-    res.json({ 
-        totalDonors: donors, totalResources: resources.length, totalStock, 
-        totalFunds: moneyResult[0]?.total || 0, fulfilledCount: fulfilled 
-    });
+    try {
+        const donors = await Donor.countDocuments();
+        const resources = await Resource.find();
+        const totalStock = resources.reduce((sum, r) => sum + (Number(r.quantity) || 0), 0);
+        const moneyResult = await Donation.aggregate([{ $group: { _id: null, total: { $sum: "$amount" } } }]);
+        const fulfilled = await Request.countDocuments({ status: 'Fulfilled' });
+        res.json({ 
+            totalDonors: donors, totalResources: resources.length, totalStock, 
+            totalFunds: moneyResult[0]?.total || 0, fulfilledCount: fulfilled 
+        });
+    } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
+// THIS ROUTE WAS MISSING (The 404 Fix)
 app.get('/api/stats/top-donors', authenticate, async (req, res) => {
     try {
         const topDonors = await Donation.aggregate([
@@ -224,6 +236,4 @@ app.get('/api/distribution', authenticate, async (req, res) => {
     } catch (err) { res.status(500).json({ message: "Error" }); }
 });
 
-// PORT Logic for Deployment
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`🚀 NGO ENGINE: Running on port ${PORT}`));
+app.listen(5000, () => console.log(`🚀 NGO ENGINE: Running on port 5000`));

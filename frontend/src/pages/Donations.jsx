@@ -30,7 +30,6 @@ const Donations = () => {
     try {
       setLoading(true);
       const [donRes, donorRes] = await Promise.all([getDonations(), getDonors()]);
-      // Debug: console.log("Raw Donations:", donRes.data); 
       setDonations(donRes.data || []);
       setDonors(donorRes.data || []);
     } catch (err) { 
@@ -56,6 +55,21 @@ const Donations = () => {
     }
   };
 
+  // --- NEW DELETE HANDLER ---
+  const handleDelete = async (id) => {
+    if (window.confirm("CRITICAL: Purging this record will also deduct its quantity from the Global Vault. Proceed?")) {
+      try {
+        await deleteDonation(id);
+        // Optimistic UI update or reload
+        setDonations(prev => prev.filter(item => item._id !== id));
+        alert("Ledger entry purged successfully.");
+      } catch (err) {
+        console.error("Delete error:", err);
+        alert("Failed to purge entry. Check console for details.");
+      }
+    }
+  };
+
   const generateReceipt = (d) => {
     try {
       const doc = new jsPDF();
@@ -67,7 +81,6 @@ const Donations = () => {
       
       doc.setTextColor(0, 0, 0);
       doc.setFontSize(12);
-      // Hybrid logic for PDF too
       const donorName = typeof d.donor === 'object' ? d.donor?.name : (d.donor || 'Anonymous');
       
       doc.text(`Receipt ID: ${d._id?.toUpperCase() || "N/A"}`, 20, 60);
@@ -109,6 +122,7 @@ const Donations = () => {
 
   return (
     <div className="p-10 max-w-7xl mx-auto min-h-screen">
+      {/* Header Section */}
       <div className="flex flex-col md:flex-row justify-between items-start gap-6 mb-12">
         <div>
           <h1 className="text-5xl font-black text-[#0f172a] uppercase tracking-tighter italic flex items-center gap-3">
@@ -129,6 +143,7 @@ const Donations = () => {
         </div>
       </div>
 
+      {/* Search Bar */}
       <div className="relative mb-10">
         <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
         <input 
@@ -138,6 +153,7 @@ const Donations = () => {
         />
       </div>
 
+      {/* Donation Cards */}
       <div className="grid grid-cols-1 gap-5">
         {donations
           .filter(d => {
@@ -145,7 +161,6 @@ const Donations = () => {
             return dName?.toLowerCase().includes(searchTerm) || d.item?.toLowerCase().includes(searchTerm);
           })
           .map(d => {
-            // HYBRID NAME LOGIC: Works for both Object and String
             const displayDonorName = typeof d.donor === 'object' ? d.donor?.name : (d.donor || 'Anonymous');
 
             return (
@@ -172,8 +187,14 @@ const Donations = () => {
                   <button onClick={() => generateReceipt(d)} className="p-3 bg-slate-50 text-slate-400 hover:text-blue-600 rounded-xl transition-all">
                     <FileText size={20} />
                   </button>
+                  
+                  {/* Updated Admin Delete Logic */}
                   {userRole === 'admin' && (
-                    <button onClick={() => deleteDonation(d._id).then(loadData)} className="p-3 text-slate-100 hover:text-red-500 rounded-xl transition-all">
+                    <button 
+                      onClick={() => handleDelete(d._id)} 
+                      className="p-3 text-slate-200 hover:text-red-500 rounded-xl transition-all"
+                      title="Purge Record"
+                    >
                         <Trash2 size={20} />
                     </button>
                   )}
@@ -183,6 +204,7 @@ const Donations = () => {
           })}
       </div>
 
+      {/* Form Modal remains unchanged... */}
       {showForm && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md flex items-center justify-center z-50 p-6">
           <div className="bg-white p-12 rounded-[3.5rem] w-full max-w-lg shadow-2xl relative border border-white">

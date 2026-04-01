@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const API = axios.create({ baseURL: 'https://ngo-inv.onrender.com/api' });
+// --- CHANGE THIS LINE FOR LOCALHOST ---
+const API = axios.create({ baseURL: 'http://localhost:5000/api' });
 
 // --- INTERCEPTOR: ATTACH TOKEN AUTOMATICALLY ---
 API.interceptors.request.use((config) => {
@@ -36,6 +37,6 @@ export const updateRequest = (id, data) => API.patch(`/requests/${id}/fulfill`, 
 // --- ANALYTICS & TOP DONORS ---
 export const getStats = () => API.get('/stats');
 export const getDistribution = () => API.get('/distribution');
-export const getTopDonors = () => API.get('/stats/top-donors'); // Added this
+export const getTopDonors = () => API.get('/stats/top-donors'); 
 
 export default API;
