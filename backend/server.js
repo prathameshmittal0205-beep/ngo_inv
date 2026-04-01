@@ -76,6 +76,27 @@ app.post('/api/auth/login', async (req, res) => {
     res.json({ token, role: user.role, username: user.username });
 });
 
+app.post('/api/auth/register', async (req, res) => {
+    try {
+        const existingUser = await User.findOne({ username: req.body.username });
+        if (existingUser) return res.status(400).json({ message: "Username already taken" });
+        
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(req.body.password, salt);
+        
+        const newUser = new User({
+            username: req.body.username,
+            password: hashedPassword,
+            role: 'volunteer' // default role
+        });
+        
+        await newUser.save();
+        res.status(201).json({ message: "Account created successfully" });
+    } catch (err) {
+        res.status(500).json({ message: "Registration failed", error: err.message });
+    }
+});
+
 // DONORS
 app.get('/api/donors', authenticate, async (req, res) => res.json(await Donor.find().sort({ name: 1 })));
 
