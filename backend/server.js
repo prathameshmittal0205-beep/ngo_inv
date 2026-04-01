@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -8,11 +9,11 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-const JWT_SECRET = "ngo_connect_ultra_secret_2026"; 
+const JWT_SECRET = process.env.JWT_SECRET || "ngo_connect_ultra_secret_2026"; 
 
 // --- 1. DB CONNECTION ---
-mongoose.connect('mongodb://localhost:27017/ngo_db')
-    .then(() => console.log("🚀 NGO ENGINE: Connected to ngo_db"))
+mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/ngo_db')
+    .then(() => console.log("🚀 NGO ENGINE: Connected to DB"))
     .catch(err => console.error("❌ DB Error:", err));
 
 // --- 2. MODELS ---
@@ -236,4 +237,5 @@ app.get('/api/distribution', authenticate, async (req, res) => {
     } catch (err) { res.status(500).json({ message: "Error" }); }
 });
 
-app.listen(5000, () => console.log(`🚀 NGO ENGINE: Running on port 5000`));
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`🚀 NGO ENGINE: Running on port ${PORT}`));
