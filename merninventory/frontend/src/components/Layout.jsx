@@ -7,12 +7,36 @@ const Layout = () => {
   return (
     <div>
       <Navbar />
-      <div className="d-flex" style={{ height: '100vh', overflow: 'hidden' }}>
-        <Sidebar />
-        <div className="flex-grow-1 p-4" style={{ overflowY: 'auto', marginTop: '50px' }}>
-          {/* 70px is for the height of your Navbar */}
+
+      <div style={{ display: 'flex' }}>
+
+        {/* Sidebar FULL HEIGHT */}
+        <div
+          style={{
+            width: '250px',
+            height: '100vh',
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            backgroundColor: '#212529',
+            paddingTop: '56px' // 👈 THIS IS KEY
+          }}
+        >
+          <Sidebar />
+        </div>
+
+        {/* Main Content */}
+        <div
+          style={{
+            marginLeft: '250px',
+            marginTop: '56px',
+            padding: '20px',
+            width: '100%'
+          }}
+        >
           <Outlet />
         </div>
+
       </div>
     </div>
   );

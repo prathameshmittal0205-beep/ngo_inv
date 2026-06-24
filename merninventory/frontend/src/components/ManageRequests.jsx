@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import axiosInstance from '../api/axiosInstance';
 
-const ManageOrders = () => {
-  const [orders, setOrders] = useState([]);
+const ManageRequests = () => {
+  const [requests, setOrders] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [modalShow, setModalShow] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
@@ -19,48 +20,39 @@ const ManageOrders = () => {
 
   const fetchOrders = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/orders');
-      const data = await response.json();
-      setOrders(data);
+      const response = await axiosInstance.get('/api/requests');
+      setOrders(response.data);
     } catch (error) {
-      console.error('Error fetching orders:', error);
+      console.error('Error fetching requests:', error);
     }
   };
 
   const handleDelete = async (orderId) => {
     try {
-      await fetch(`http://localhost:5000/api/orders/${orderId}`, {
-        method: 'DELETE',
-      });
+      await axiosInstance.delete(`/api/requests/${orderId}`);
       fetchOrders();
     } catch (error) {
-      console.error('Error deleting order:', error);
+      console.error('Error deleting request:', error);
     }
   };
 
   const handleUpdate = async (orderId) => {
     try {
-      await fetch(`http://localhost:5000/api/orders/${orderId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(updatedOrder),
-      });
+      await axiosInstance.put(`/api/requests/${orderId}`, updatedOrder);
       fetchOrders();
       setModalShow(false);
     } catch (error) {
-      console.error('Error updating order:', error);
+      console.error('Error updating request:', error);
     }
   };
 
-  const handleEditClick = (order) => {
-    setSelectedOrder(order);
+  const handleEditClick = (request) => {
+    setSelectedOrder(request);
     setUpdatedOrder({
-      customerName: order.customerName,
-      productName: order.productName,
-      quantity: order.quantity,
-      price: order.price,
+      customerName: request.customerName,
+      productName: request.productName,
+      quantity: request.quantity,
+      price: request.price,
     });
     setModalShow(true);
   };
@@ -77,14 +69,14 @@ const ManageOrders = () => {
     setSearchTerm(e.target.value.toLowerCase());
   };
 
-  const filteredOrders = orders.filter(order =>
-    order.customerName.toLowerCase().includes(searchTerm) ||
-    order.productName.toLowerCase().includes(searchTerm)
+  const filteredOrders = requests.filter(request =>
+    request.customerName.toLowerCase().includes(searchTerm) ||
+    request.productName.toLowerCase().includes(searchTerm)
   );
 
   return (
     <div className="container mt-5">
-      <h2 className="mb-4">Manage Orders</h2>
+      <h2 className="mb-4">Manage Requests</h2>
       
       <div className="input-group mb-3">
         <input
@@ -108,22 +100,22 @@ const ManageOrders = () => {
         </thead>
         <tbody>
           {filteredOrders.length > 0 ? (
-            filteredOrders.map(order => (
-              <tr key={order._id}>
-                <td>{order.customerName}</td>
-                <td>{order.productName}</td>
-                <td>{order.quantity}</td>
-                <td>{order.price}</td>
+            filteredOrders.map(request => (
+              <tr key={request._id}>
+                <td>{request.customerName}</td>
+                <td>{request.productName}</td>
+                <td>{request.quantity}</td>
+                <td>{request.price}</td>
                 <td>
                   <button
                     className="btn btn-warning"
-                    onClick={() => handleEditClick(order)}
+                    onClick={() => handleEditClick(request)}
                   >
                     Edit
                   </button>
                   <button
                     className="btn btn-danger ml-2"
-                    onClick={() => handleDelete(order._id)}
+                    onClick={() => handleDelete(request._id)}
                   >
                     Delete
                   </button>
@@ -132,7 +124,7 @@ const ManageOrders = () => {
             ))
           ) : (
             <tr>
-              <td colSpan="5" className="text-center">No orders found</td>
+              <td colSpan="5" className="text-center">No requests found</td>
             </tr>
           )}
         </tbody>
@@ -143,7 +135,7 @@ const ManageOrders = () => {
         <div className="modal-dialog" role="document">
           <div className="modal-content">
             <div className="modal-header">
-              <h5 className="modal-title">Update Order</h5>
+              <h5 className="modal-title">Update Request</h5>
               <button type="button" className="close" aria-label="Close" onClick={() => setModalShow(false)}>
                 <span aria-hidden="true">&times;</span>
               </button>
@@ -203,4 +195,4 @@ const ManageOrders = () => {
   );
 };
 
-export default ManageOrders;
+export default ManageRequests;

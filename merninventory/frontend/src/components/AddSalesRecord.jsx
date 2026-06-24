@@ -1,6 +1,6 @@
 // src/components/AddSalesRecord.js
 import React, { useState } from 'react';
-import axios from 'axios';
+import axiosInstance from '../api/axiosInstance';
 
 const AddSalesRecord = () => {
   const [customerName, setCustomerName] = useState('');
@@ -12,7 +12,7 @@ const AddSalesRecord = () => {
     e.preventDefault();
     try {
       const newSale = { customerName, productName, quantity, price };
-      await axios.post('http://localhost:5000/api/sales/add', newSale);
+      await axiosInstance.post('/api/sales/add', newSale);
       setCustomerName('');
       setProductName('');
       setQuantity('');

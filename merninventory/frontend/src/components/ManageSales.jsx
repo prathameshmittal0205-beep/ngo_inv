@@ -1,6 +1,6 @@
 // src/components/ManageSales.js
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import axiosInstance from '../api/axiosInstance';
 
 const ManageSales = () => {
   const [sales, setSales] = useState([]);
@@ -12,7 +12,7 @@ const ManageSales = () => {
 
   const fetchSales = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/sales/');
+      const response = await axiosInstance.get('/api/sales/');
       setSales(response.data);
     } catch (error) {
       console.error('Error fetching sales records:', error);
@@ -21,7 +21,7 @@ const ManageSales = () => {
 
   const deleteSale = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/sales/${id}`);
+      await axiosInstance.delete(`/api/sales/${id}`);
       setSales(sales.filter((sale) => sale._id !== id));
       alert('Sale record deleted successfully!');
     } catch (error) {

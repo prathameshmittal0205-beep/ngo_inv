@@ -1,15 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import Navbar from './Navbar';
-import Sidebar from './Sidebar';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import '../App.css'; // Assuming you'll put custom styles here
+import '../App.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import { Card, Table } from 'react-bootstrap';
 import { Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
-import axios from 'axios';
+import axiosInstance from '../api/axiosInstance';
 
-// Register components
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 const Dashboard = () => {
@@ -26,144 +23,121 @@ const Dashboard = () => {
 
   const fetchData = async () => {
     try {
-      // Get total orders
-      const ordersResponse = await axios.get('http://localhost:5000/api/orders');
+      const ordersResponse = await axiosInstance.get('/api/requests');
       setTotalOrders(ordersResponse.data.length);
 
-      // Get total suppliers
-      const suppliersResponse = await axios.get('http://localhost:5000/api/suppliers');
+      const suppliersResponse = await axiosInstance.get('/api/providers');
       setTotalSuppliers(suppliersResponse.data.length);
 
-      // Get total inventory items
-      const inventoryResponse = await axios.get('http://localhost:5000/api/inventory');
+      const inventoryResponse = await axiosInstance.get('/api/resources');
       setTotalInventory(inventoryResponse.data.length);
 
-      // Get total employees and employee data
-      const employeesResponse = await axios.get('http://localhost:5000/api/employees');
+      const employeesResponse = await axiosInstance.get('/api/employees');
       setTotalEmployees(employeesResponse.data.length);
       setEmployees(employeesResponse.data);
 
-      // Dummy sales data
       const dummySalesData = [
-        { month: 'January', sales: 500 },
-        { month: 'February', sales: 700 },
-        { month: 'March', sales: 800 },
-        { month: 'April', sales: 600 },
+        { month: 'Jan', sales: 500 },
+        { month: 'Feb', sales: 700 },
+        { month: 'Mar', sales: 800 },
+        { month: 'Apr', sales: 600 },
         { month: 'May', sales: 900 },
-        { month: 'June', sales: 750 },
-        { month: 'July', sales: 650 },
-        { month: 'August', sales: 850 },
-        { month: 'September', sales: 700 },
-        { month: 'October', sales: 950 },
-        { month: 'November', sales: 900 },
-        { month: 'December', sales: 1100 },
+        { month: 'Jun', sales: 750 },
       ];
+
       setSalesData(dummySalesData);
+
     } catch (error) {
-      console.error('Error fetching dashboard data:', error.message || error);
+      console.error('Error fetching dashboard data:', error);
     }
   };
 
-  const salesChartData = {
-    labels: salesData.map((data) => data.month),
+  const chartData = {
+    labels: salesData.map(d => d.month),
     datasets: [
       {
-        label: 'Sales',
+        label: 'Resource Usage',
+        data: salesData.map(d => d.sales),
         backgroundColor: 'rgba(75, 192, 192, 0.6)',
-        borderColor: 'rgba(75, 192, 192, 1)',
-        borderWidth: 1,
-        hoverBackgroundColor: 'rgba(75, 192, 192, 0.8)',
-        hoverBorderColor: 'rgba(75, 192, 192, 1)',
-        data: salesData.map((data) => data.sales),
       },
     ],
   };
 
   return (
-    <>
-      <Navbar />
-      <div className="container-fluid">
-        <div className="row">
-          <div className="col-md-2 p-0 vh-100 bg-dark" style={{ position: 'fixed', left: 0, top: 0 }}>
-            <Sidebar />
-          </div>
+    <div className="container-fluid">
 
-          <div className="col-md-10 offset-md-2" style={{ marginTop: '60px' }}>
-            <div className="mt-4 px-3">
-              <h1>Admin Dashboard</h1>
+      {/* Title */}
+      <h2 className="mb-4">Community Resource Dashboard</h2>
 
-              <div className="row mt-5">
-                <div className="col-md-3">
-                  <Card className="custom-card text-center mb-4">
-                    <Card.Body>
-                      <Card.Title>Total Orders</Card.Title>
-                      <Card.Text>{totalOrders}</Card.Text>
-                    </Card.Body>
-                  </Card>
-                </div>
-                <div className="col-md-3">
-                  <Card className="custom-card text-center mb-4">
-                    <Card.Body>
-                      <Card.Title>Total Suppliers</Card.Title>
-                      <Card.Text>{totalSuppliers}</Card.Text>
-                    </Card.Body>
-                  </Card>
-                </div>
-                <div className="col-md-3">
-                  <Card className="custom-card text-center mb-4">
-                    <Card.Body>
-                      <Card.Title>Total Inventory</Card.Title>
-                      <Card.Text>{totalInventory}</Card.Text>
-                    </Card.Body>
-                  </Card>
-                </div>
-                <div className="col-md-3">
-                  <Card className="custom-card text-center mb-4">
-                    <Card.Body>
-                      <Card.Title>Total Employees</Card.Title>
-                      <Card.Text>{totalEmployees}</Card.Text>
-                    </Card.Body>
-                  </Card>
-                </div>
-              </div>
+      {/* Cards */}
+      <div className="row">
+        <div className="col-md-3">
+          <Card className="text-center mb-4">
+            <Card.Body>
+              <Card.Title>Total Requests</Card.Title>
+              <Card.Text>{totalOrders}</Card.Text>
+            </Card.Body>
+          </Card>
+        </div>
 
-              <div className="row mt-4">
-                <div className="col-12">
-                  <h3>Employees</h3>
-                  <Table className="custom-table" striped bordered hover>
-                    <thead>
-                      <tr>
-                        <th>Name</th>
-                        <th>Department</th>
-                        <th>Email</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {employees.map((employee) => (
-                        <tr key={employee._id}>
-                          <td>{employee.name}</td>
-                          <td>{employee.department}</td>
-                          <td>{employee.email}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </Table>
-                </div>
-              </div>
+        <div className="col-md-3">
+          <Card className="text-center mb-4">
+            <Card.Body>
+              <Card.Title>Total Providers</Card.Title>
+              <Card.Text>{totalSuppliers}</Card.Text>
+            </Card.Body>
+          </Card>
+        </div>
 
-              <div className="row mt-4">
-                <div className="col-12">
-                  <h3>Sales</h3>
-                  <div className="chart-container">
-                    <Bar data={salesChartData} />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+        <div className="col-md-3">
+          <Card className="text-center mb-4">
+            <Card.Body>
+              <Card.Title>Total Resources</Card.Title>
+              <Card.Text>{totalInventory}</Card.Text>
+            </Card.Body>
+          </Card>
+        </div>
+
+        <div className="col-md-3">
+          <Card className="text-center mb-4">
+            <Card.Body>
+              <Card.Title>Total Members</Card.Title>
+              <Card.Text>{totalEmployees}</Card.Text>
+            </Card.Body>
+          </Card>
         </div>
       </div>
-    </>
+
+      {/* Table */}
+      <div className="mt-4">
+        <h4>Community Members</h4>
+        <Table striped bordered hover>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Department</th>
+              <th>Email</th>
+            </tr>
+          </thead>
+          <tbody>
+            {employees.map(emp => (
+              <tr key={emp._id}>
+                <td>{emp.name}</td>
+                <td>{emp.department}</td>
+                <td>{emp.email}</td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
+      </div>
+
+      {/* Chart */}
+      <div className="mt-4">
+        <h4>Resource Usage</h4>
+        <Bar data={chartData} />
+      </div>
+
+    </div>
   );
 };
 

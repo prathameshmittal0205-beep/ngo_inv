@@ -9,4 +9,4 @@ const SupplierSchema = new mongoose.Schema({
   paymentTerms: String
 });
 
-module.exports = mongoose.model('Supplier', SupplierSchema);
+module.exports = mongoose.model('Provider', SupplierSchema);

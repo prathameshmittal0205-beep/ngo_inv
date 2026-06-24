@@ -1,13 +1,13 @@
-// components/EditSupplier.js
+// components/EditProvider.js
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import axiosInstance from '../api/axiosInstance';
 import { useParams, useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-const EditSupplier = () => {
+const EditProvider = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [supplier, setSupplier] = useState({
+  const [provider, setSupplier] = useState({
     supplierName: '',
     phone: '',
     email: '',
@@ -20,10 +20,10 @@ const EditSupplier = () => {
     if (id) {
       const fetchSupplier = async () => {
         try {
-          const response = await axios.get(`http://localhost:5000/api/suppliers/${id}`);
+          const response = await axiosInstance.get(`/api/providers/${id}`);
           setSupplier(response.data);
         } catch (error) {
-          console.error('Error fetching supplier:', error);
+          console.error('Error fetching provider:', error);
         }
       };
       fetchSupplier();
@@ -32,34 +32,34 @@ const EditSupplier = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setSupplier({ ...supplier, [name]: value });
+    setSupplier({ ...provider, [name]: value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       if (id) {
-        await axios.put(`http://localhost:5000/api/suppliers/${id}`, supplier);
+        await axiosInstance.put(`/api/providers/${id}`, provider);
       } else {
-        await axios.post('http://localhost:5000/api/suppliers', supplier);
+        await axiosInstance.post('/api/providers', provider);
       }
-      navigate('/dashboard/suppliers/manage'); // Redirect to ManageSuppliers after successful update
+      navigate('/dashboard/providers/manage'); // Redirect to ManageProviders after successful update
     } catch (error) {
-      console.error('Error saving supplier:', error);
+      console.error('Error saving provider:', error);
     }
   };
 
   return (
     <div className="container mt-5">
-      <h2>{id ? 'Edit Supplier' : 'Add New Supplier'}</h2>
+      <h2>{id ? 'Edit Provider' : 'Add New Provider'}</h2>
       <form onSubmit={handleSubmit}>
         <div className="mb-3">
-          <label className="form-label">Supplier Name</label>
+          <label className="form-label">Provider Name</label>
           <input
             type="text"
             className="form-control"
             name="supplierName"
-            value={supplier.supplierName}
+            value={provider.supplierName}
             onChange={handleChange}
             required
           />
@@ -70,7 +70,7 @@ const EditSupplier = () => {
             type="text"
             className="form-control"
             name="phone"
-            value={supplier.phone}
+            value={provider.phone}
             onChange={handleChange}
             required
           />
@@ -81,7 +81,7 @@ const EditSupplier = () => {
             type="email"
             className="form-control"
             name="email"
-            value={supplier.email}
+            value={provider.email}
             onChange={handleChange}
             required
           />
@@ -92,7 +92,7 @@ const EditSupplier = () => {
             type="text"
             className="form-control"
             name="address"
-            value={supplier.address}
+            value={provider.address}
             onChange={handleChange}
             required
           />
@@ -103,7 +103,7 @@ const EditSupplier = () => {
             type="text"
             className="form-control"
             name="supplyProducts"
-            value={supplier.supplyProducts}
+            value={provider.supplyProducts}
             onChange={handleChange}
             required
           />
@@ -114,17 +114,17 @@ const EditSupplier = () => {
             type="text"
             className="form-control"
             name="paymentTerms"
-            value={supplier.paymentTerms}
+            value={provider.paymentTerms}
             onChange={handleChange}
             required
           />
         </div>
         <button type="submit" className="btn btn-primary">
-          {id ? 'Update Supplier' : 'Add Supplier'}
+          {id ? 'Update Provider' : 'Add Provider'}
         </button>
       </form>
     </div>
   );
 };
 
-export default EditSupplier;
+export default EditProvider;

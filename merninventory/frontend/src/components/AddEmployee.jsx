@@ -1,6 +1,6 @@
 // src/components/AddEmployee.js
 import React, { useState } from 'react';
-import axios from 'axios';
+import axiosInstance from '../api/axiosInstance';
 
 const AddEmployee = ({ onEmployeeAdded }) => {
   const [name, setName] = useState('');
@@ -11,7 +11,7 @@ const AddEmployee = ({ onEmployeeAdded }) => {
     e.preventDefault();
     try {
       const newEmployee = { name, department, email };
-      await axios.post('http://localhost:5000/api/employees', newEmployee);
+      await axiosInstance.post('/api/employees', newEmployee);
       onEmployeeAdded();
       setName('');
       setDepartment('');

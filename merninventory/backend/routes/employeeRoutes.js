@@ -2,6 +2,19 @@
 const express = require('express');
 const router = express.Router();
 const Employee = require('../models/employeeModel');
+const verifyToken = require('../middleware/auth');
+
+// Get employee count
+router.get('/count', async (req, res) => {
+  try {
+    const count = await Employee.countDocuments();
+    res.json({ count });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+router.use(verifyToken);
 
 // @route   GET /api/employees
 // @desc    Get all employees
@@ -16,15 +29,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-// Get employee count
-router.get('/count', async (req, res) => {
-  try {
-    const count = await Employee.countDocuments();
-    res.json({ count });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
+
 // @route   POST /api/employees
 // @desc    Add a new employee
 // @access  Public

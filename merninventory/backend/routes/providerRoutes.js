@@ -1,6 +1,19 @@
 const express = require('express');
 const router = express.Router();
-const Supplier = require('../models/Supplier');
+const Provider = require('../models/Provider');
+const verifyToken = require('../middleware/auth');
+
+// Get supplier count
+router.get('/count', async (req, res) => {
+  try {
+    const count = await Provider.countDocuments();
+    res.json({ count });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+router.use(verifyToken);
 
 // Get all suppliers with optional search and filter
 router.get('/', async (req, res) => {
@@ -16,25 +29,18 @@ router.get('/', async (req, res) => {
       query.supplyProducts = { $regex: filter, $options: 'i' };
     }
 
-    const suppliers = await Supplier.find(query);
+    const suppliers = await Provider.find(query);
     res.json(suppliers);
   } catch (error) {
     res.status(500).json({ message: 'Error retrieving suppliers', error: error.message });
   }
 });
 
-// Get supplier count
-router.get('/count', async (req, res) => {
-  try {
-    const count = await Supplier.countDocuments();
-    res.json({ count });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }});
+
 // Get a single supplier by ID
 router.get('/:id', async (req, res) => {
   try {
-    const supplier = await Supplier.findById(req.params.id);
+    const supplier = await Provider.findById(req.params.id);
     if (supplier) {
       res.json(supplier);
     } else {
@@ -59,7 +65,7 @@ router.post('/', async (req, res) => {
 // Update a supplier by ID
 router.put('/:id', async (req, res) => {
   try {
-    const updatedSupplier = await Supplier.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const updatedSupplier = await Provider.findByIdAndUpdate(req.params.id, req.body, { new: true });
     if (updatedSupplier) {
       res.json(updatedSupplier);
     } else {
@@ -73,7 +79,7 @@ router.put('/:id', async (req, res) => {
 // Delete a supplier by ID
 router.delete('/:id', async (req, res) => {
   try {
-    const deletedSupplier = await Supplier.findByIdAndDelete(req.params.id);
+    const deletedSupplier = await Provider.findByIdAndDelete(req.params.id);
     if (deletedSupplier) {
       res.json({ message: 'Supplier deleted' });
     } else {

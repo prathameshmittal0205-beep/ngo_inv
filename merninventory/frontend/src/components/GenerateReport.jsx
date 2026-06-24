@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import axiosInstance from '../api/axiosInstance';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 
@@ -11,7 +11,7 @@ const GenerateReport = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.get('http://localhost:5000/api/reports/sales-report', {
+      const response = await axiosInstance.get('/api/reports/sales-report', {
         params: { startDate, endDate },
       });
       setReport(response.data);

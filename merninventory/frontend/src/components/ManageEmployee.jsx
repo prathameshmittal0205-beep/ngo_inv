@@ -1,6 +1,6 @@
 // src/components/ManageEmployee.js
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import axiosInstance from '../api/axiosInstance';
 
 const ManageEmployee = () => {
   const [employees, setEmployees] = useState([]);
@@ -14,7 +14,7 @@ const ManageEmployee = () => {
 
   const fetchEmployees = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/employees');
+      const response = await axiosInstance.get('/api/employees');
       setEmployees(response.data);
     } catch (error) {
       console.error('Error fetching employees:', error);
@@ -33,7 +33,7 @@ const ManageEmployee = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/employees/${id}`);
+      await axiosInstance.delete(`/api/employees/${id}`);
       fetchEmployees();
     } catch (error) {
       console.error('Error deleting employee:', error);
@@ -48,7 +48,7 @@ const ManageEmployee = () => {
   const handleUpdate = async (e) => {
     e.preventDefault();
     try {
-      await axios.put(`http://localhost:5000/api/employees/${editingEmployee}`, formData);
+      await axiosInstance.put(`/api/employees/${editingEmployee}`, formData);
       setEditingEmployee(null);
       setFormData({ name: '', department: '', email: '' });
       fetchEmployees();

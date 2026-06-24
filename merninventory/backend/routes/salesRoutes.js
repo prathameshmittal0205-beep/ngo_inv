@@ -1,6 +1,9 @@
 const express = require('express');
 const Sales = require('../models/sales');
+const verifyToken = require('../middleware/auth');
 const router = express.Router();
+
+router.use(verifyToken);
 
 // Add a new sales record
 router.post('/add', async (req, res) => {
@@ -22,15 +25,7 @@ router.get('/', async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
-// Get all sales records
-router.get('/', async (req, res) => {
-  try {
-    const sales = await Sales.find();
-    res.status(200).json(sales);
-  } catch (error) {
-    res.status(500).json({ message: 'Error fetching sales', error });
-  }
-});
+
 
 // Update a sales record
 router.put('/:id', async (req, res) => {

@@ -1,6 +1,9 @@
 const express = require('express');
 const Sales = require('../models/sales');
+const verifyToken = require('../middleware/auth');
 const router = express.Router();
+
+router.use(verifyToken);
 
 // Generate sales report based on date range
 router.get('/sales-report', async (req, res) => {

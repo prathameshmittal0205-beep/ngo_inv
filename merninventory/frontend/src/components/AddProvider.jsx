@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import axios from 'axios';
+import axiosInstance from '../api/axiosInstance';
 
-const AddSupplier = () => {
+const AddProvider = () => {
   // State to manage form data
-  const [supplier, setSupplier] = useState({
+  const [provider, setSupplier] = useState({
     supplierName: '',
     phone: '',
     email: '',
@@ -18,8 +18,8 @@ const AddSupplier = () => {
     e.preventDefault();
     try {
       // Sending data to the backend
-      await axios.post('http://localhost:5000/api/suppliers', supplier);
-      alert('Supplier added successfully');
+      await axiosInstance.post('/api/providers', provider);
+      alert('Provider added successfully');
       setSupplier({
         supplierName: '',
         phone: '',
@@ -29,21 +29,21 @@ const AddSupplier = () => {
         paymentTerms: '',
       });
     } catch (error) {
-      console.error('Error adding supplier:', error);
+      console.error('Error adding provider:', error);
     }
   };
 
   return (
     <div className="container mt-5">
-      <h2>Add Supplier</h2>
+      <h2>Add Provider</h2>
       <form onSubmit={handleSubmit}>
         <div className="mb-3">
-          <label className="form-label">Supplier Name</label>
+          <label className="form-label">Provider Name</label>
           <input
             type="text"
             className="form-control"
-            value={supplier.supplierName}
-            onChange={(e) => setSupplier({ ...supplier, supplierName: e.target.value })}
+            value={provider.supplierName}
+            onChange={(e) => setSupplier({ ...provider, supplierName: e.target.value })}
             required
           />
         </div>
@@ -52,8 +52,8 @@ const AddSupplier = () => {
           <input
             type="tel"
             className="form-control"
-            value={supplier.phone}
-            onChange={(e) => setSupplier({ ...supplier, phone: e.target.value })}
+            value={provider.phone}
+            onChange={(e) => setSupplier({ ...provider, phone: e.target.value })}
             required
           />
         </div>
@@ -62,8 +62,8 @@ const AddSupplier = () => {
           <input
             type="email"
             className="form-control"
-            value={supplier.email}
-            onChange={(e) => setSupplier({ ...supplier, email: e.target.value })}
+            value={provider.email}
+            onChange={(e) => setSupplier({ ...provider, email: e.target.value })}
             required
           />
         </div>
@@ -72,8 +72,8 @@ const AddSupplier = () => {
           <input
             type="text"
             className="form-control"
-            value={supplier.address}
-            onChange={(e) => setSupplier({ ...supplier, address: e.target.value })}
+            value={provider.address}
+            onChange={(e) => setSupplier({ ...provider, address: e.target.value })}
             required
           />
         </div>
@@ -82,8 +82,8 @@ const AddSupplier = () => {
           <input
             type="text"
             className="form-control"
-            value={supplier.supplyProducts}
-            onChange={(e) => setSupplier({ ...supplier, supplyProducts: e.target.value })}
+            value={provider.supplyProducts}
+            onChange={(e) => setSupplier({ ...provider, supplyProducts: e.target.value })}
             required
           />
         </div>
@@ -92,15 +92,15 @@ const AddSupplier = () => {
           <input
             type="text"
             className="form-control"
-            value={supplier.paymentTerms}
-            onChange={(e) => setSupplier({ ...supplier, paymentTerms: e.target.value })}
+            value={provider.paymentTerms}
+            onChange={(e) => setSupplier({ ...provider, paymentTerms: e.target.value })}
             required
           />
         </div>
-        <button type="submit" className="btn btn-primary">Add Supplier</button>
+        <button type="submit" className="btn btn-primary">Add Provider</button>
       </form>
     </div>
   );
 };
 
-export default AddSupplier;
+export default AddProvider;

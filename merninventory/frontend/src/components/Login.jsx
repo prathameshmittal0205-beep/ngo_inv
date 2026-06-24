@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import axiosInstance from '../api/axiosInstance';
 import './Login.css'; // Import CSS file
 
 const Login = () => {
@@ -11,8 +11,9 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:5000/api/login', { email, password });
+      const response = await axiosInstance.post('/api/login', { email, password });
       if (response.data.success) {
+        localStorage.setItem('token', response.data.token);
         navigate('/dashboard');
       } else {
         alert(response.data.message);

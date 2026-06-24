@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import axiosInstance from '../api/axiosInstance';
 
-const AddInventoryItem = () => {
+const AddResource = () => {
   const [name, setName] = useState('');
   const [quantity, setQuantity] = useState('');
   const [price, setPrice] = useState('');
@@ -15,7 +15,7 @@ const AddInventoryItem = () => {
 
     try {
       const newItem = { name, quantity: Number(quantity), price: Number(price) };
-      await axios.post('http://localhost:5000/api/inventory/add', newItem);
+      await axiosInstance.post('/api/resources/add', newItem);
       setName('');
       setQuantity('');
       setPrice('');
@@ -30,7 +30,7 @@ const AddInventoryItem = () => {
 
   return (
     <div className="container mt-4">
-      <h3>Add Inventory Item</h3>
+      <h3>Add Resource</h3>
       <form onSubmit={handleSubmit}>
         <div className="mb-3">
           <label htmlFor="name" className="form-label">Item Name</label>
@@ -74,4 +74,4 @@ const AddInventoryItem = () => {
   );
 };
 
-export default AddInventoryItem;
+export default AddResource;

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import axiosInstance from '../api/axiosInstance';
 
-const ManageInventories = () => {
+const ManageResources = () => {
   const [items, setItems] = useState([]);
   const [search, setSearch] = useState('');
   const [editItem, setEditItem] = useState(null);
@@ -16,7 +16,7 @@ const ManageInventories = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.get('http://localhost:5000/api/inventory');
+      const response = await axiosInstance.get('/api/resources');
       setItems(Array.isArray(response.data) ? response.data : []);
     } catch (err) {
       setError('Error fetching inventory items');
@@ -31,7 +31,7 @@ const ManageInventories = () => {
 
     setError(null);
     try {
-      await axios.delete(`http://localhost:5000/api/inventory/${id}`);
+      await axiosInstance.delete(`/api/resources/${id}`);
       setItems((prevItems) => prevItems.filter((item) => item._id !== id)); // Optimistic update
       alert('Item deleted successfully!');
     } catch (err) {
@@ -48,7 +48,7 @@ const ManageInventories = () => {
     e.preventDefault();
     setError(null);
     try {
-      await axios.put(`http://localhost:5000/api/inventory/${editItem._id}`, editItem);
+      await axiosInstance.put(`/api/resources/${editItem._id}`, editItem);
       setItems((prevItems) =>
         prevItems.map((item) =>
           item._id === editItem._id ? editItem : item
@@ -68,7 +68,7 @@ const ManageInventories = () => {
 
   return (
     <div className="container mt-4">
-      <h3>Manage Inventory</h3>
+      <h3>Manage Resources</h3>
       {error && <div className="alert alert-danger">{error}</div>}
       <input
         type="text"
@@ -175,4 +175,4 @@ const ManageInventories = () => {
   );
 };
 
-export default ManageInventories;
+export default ManageResources;

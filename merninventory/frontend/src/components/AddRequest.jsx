@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import '../css/AddOrder.css';
+import '../css/AddRequest.css';
+import axiosInstance from '../api/axiosInstance';
 
-const AddOrder = () => {
-  const [order, setOrder] = useState({
+const AddRequest = () => {
+  const [request, setOrder] = useState({
     customerName: '',
     productName: '',
     quantity: '',
@@ -13,21 +14,14 @@ const AddOrder = () => {
     e.preventDefault();
     
     try {
-      const response = await fetch('http://localhost:5000/api/orders', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(order),
-      });
+      const response = await axiosInstance.post('/api/requests', request);
 
-      if (response.ok) {
-        const data = await response.json();
-        console.log('Order saved:', data);
+      if (response.status === 201 || response.status === 200) {
+        console.log('Request saved:', response.data);
         // Optionally reset the form after submission
         setOrder({ customerName: '', productName: '', quantity: '', price: '' });
       } else {
-        console.error('Failed to save order');
+        console.error('Failed to save request');
       }
     } catch (error) {
       console.error('Error:', error);
@@ -36,15 +30,15 @@ const AddOrder = () => {
 
   return (
     <div>
-      <h3>Add Order</h3>
+      <h3>Add Request</h3>
       <form onSubmit={handleSubmit}>
         <div className="mb-3">
           <label className="form-label">Customer Name</label>
           <input
             type="text"
             className="form-control"
-            value={order.customerName}
-            onChange={(e) => setOrder({ ...order, customerName: e.target.value })}
+            value={request.customerName}
+            onChange={(e) => setOrder({ ...request, customerName: e.target.value })}
           />
         </div>
         <div className="mb-3">
@@ -52,8 +46,8 @@ const AddOrder = () => {
           <input
             type="text"
             className="form-control"
-            value={order.productName}
-            onChange={(e) => setOrder({ ...order, productName: e.target.value })}
+            value={request.productName}
+            onChange={(e) => setOrder({ ...request, productName: e.target.value })}
           />
         </div>
         <div className="mb-3">
@@ -61,8 +55,8 @@ const AddOrder = () => {
           <input
             type="number"
             className="form-control"
-            value={order.quantity}
-            onChange={(e) => setOrder({ ...order, quantity: e.target.value })}
+            value={request.quantity}
+            onChange={(e) => setOrder({ ...request, quantity: e.target.value })}
           />
         </div>
         <div className="mb-3">
@@ -70,8 +64,8 @@ const AddOrder = () => {
           <input
             type="number"
             className="form-control"
-            value={order.price}
-            onChange={(e) => setOrder({ ...order, price: e.target.value })}
+            value={request.price}
+            onChange={(e) => setOrder({ ...request, price: e.target.value })}
           />
         </div>
         <button type="submit" className="btn btn-primary">Submit</button>
@@ -80,4 +74,4 @@ const AddOrder = () => {
   );
 };
 
-export default AddOrder;
+export default AddRequest;
